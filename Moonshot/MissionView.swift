@@ -40,7 +40,8 @@ struct MissionView: View {
                         .scaledToFit()
                         .frame(maxWidth: geometry.size.width * 0.7)
                         .padding(.top)
-
+                    
+                    Text(self.mission.formattedLaunchDate)
                     Text(self.mission.description)
                         .padding()
 
@@ -69,6 +70,7 @@ struct MissionView: View {
                         .buttonStyle(PlainButtonStyle())
                     }
                 }
+                Spacer(minLength: 25)
             }
         }
         .navigationBarTitle(Text(mission.displayName), displayMode: .inline)

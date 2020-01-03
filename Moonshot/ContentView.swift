@@ -8,28 +8,58 @@
 
 import SwiftUI
 
+enum Mode: String, Identifiable, CaseIterable {
+    case launchDates = "Launch Dates"
+    case crewNames = "Crew Names"
+    
+    var id: UUID {
+        return UUID()
+    }
+}
+
 struct ContentView: View {
     let astronauts: [Astronaut] = Bundle.main.decode("astronauts.json")
     let missions: [Mission] = Bundle.main.decode("missions.json")
     
+    @State private var mode = Mode.launchDates
     var body: some View {
         NavigationView {
             List(missions) { mission in
                 NavigationLink(destination: MissionView(mission: mission, astronauts: self.astronauts)) {
-                    Image(mission.image)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 44, height: 44)
+                    Group {
+                        Image(mission.image)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 44, height: 44)
 
-                    VStack(alignment: .leading) {
-                        Text(mission.displayName)
-                            .font(.headline)
-                        Text(mission.formattedLaunchDate )
+                        VStack(alignment: .leading) {
+                            Text(mission.displayName)
+                                .font(.headline)
+                            if self.mode == Mode.launchDates {
+                                Text(mission.formattedLaunchDate )
+                            } else {
+                                Text(self.crewNames(mission: mission))
+                            }
+                        }
                     }
                 }
             }
-            .navigationBarTitle("Moonshot")
+            .navigationBarItems(leading: Text("Moonshot").font(.title), trailing: Picker(selection: $mode, label: Text("Preferred View")) {
+                    ForEach(Mode.allCases) {
+                        Text($0.rawValue).tag($0)
+                    }
+                }.pickerStyle(SegmentedPickerStyle())
+            )
         }
+    }
+    
+    func crewNames(mission: Mission) -> String {
+        var names = ""
+        for member in mission.crew {
+            names += member.name + " "
+        }
+        
+        return names
     }
 }
 
